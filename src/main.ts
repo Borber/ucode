@@ -1,8 +1,7 @@
+import { createApp } from "vue";
 import "./style.css";
-import App from "./App.svelte";
+import App from "./App.vue";
 
-const app = new App({
-  target: document.getElementById("app"),
-});
-
-export default app;
+// import ElementPlus from 'element-plus'
+// import 'element-plus/lib/theme-chalk/index.css'
+createApp(App).mount("#app");

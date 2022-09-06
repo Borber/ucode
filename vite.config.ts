@@ -1,9 +1,25 @@
-import {defineConfig} from "vite";
-import {svelte} from "@sveltejs/vite-plugin-svelte";
+import { defineConfig } from "vite";
+import vue from "@vitejs/plugin-vue";
+// import ElementPlus from "unplugin-element-plus/vite";
+import AutoImport from "unplugin-auto-import/vite";
+import Components from "unplugin-vue-components/vite";
+import { ElementPlusResolver } from "unplugin-vue-components/resolvers";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [svelte()],
+  plugins: [
+      vue(),
+    // ElementPlus({
+    //   importStyle: 'sass',
+    //   useSource: true
+    // }),
+      AutoImport({
+        resolvers: [ElementPlusResolver()],
+      }),
+      Components({
+        resolvers: [ElementPlusResolver()],
+      })
+  ],
 
   // Vite optons tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   // prevent vite from obscuring rust errors
