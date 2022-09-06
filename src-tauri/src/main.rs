@@ -19,7 +19,7 @@ mod constants;
 #[command]
 async fn lans() -> Result<Vec<String>, ()> {
     let lans = LAN.to_vec();
-    info!("返回类型: {:?}", lans);
+    info!("返回语言类型: {:?}", lans);
     Ok(lans)
 }
 
