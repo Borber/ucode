@@ -17,9 +17,10 @@ mod model;
 mod constants;
 
 #[command]
-async fn greet(name: &str) -> Result<String, ()> {
-    info!("类型: {}", serde_json::to_string(LAN.as_slice()).expect("获取类型失败"));
-    Ok(format!("目前支持的语言类型共有: {}种 \n {}", LAN.len(), serde_json::to_string(LAN.as_slice()).expect("获取类型失败")))
+async fn lans() -> Result<Vec<String>, ()> {
+    let lans = LAN.to_vec();
+    info!("返回类型: {:?}", lans);
+    Ok(lans)
 }
 
 #[tokio::main]
@@ -28,7 +29,7 @@ async fn main() {
 
     tauri::async_runtime::set(tokio::runtime::Handle::current());
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![greet])
+        .invoke_handler(tauri::generate_handler![lans])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

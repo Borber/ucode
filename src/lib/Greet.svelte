@@ -5,7 +5,9 @@
     let greetMsg = ""
 
     async function greet() {
-        greetMsg = await invoke("greet", {name})
+        let s = await invoke("lans");
+        console.log(s[1]);
+        greetMsg = await invoke("lans");
     }
 </script>
 
