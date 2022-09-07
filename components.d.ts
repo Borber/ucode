@@ -7,8 +7,11 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
+    ElButton: typeof import('element-plus/es')['ElButton']
     ElOption: typeof import('element-plus/es')['ElOption']
     ElSelect: typeof import('element-plus/es')['ElSelect']
+    ElTag: typeof import('element-plus/es')['ElTag']
     Greet: typeof import('./src/components/Greet.vue')['default']
+    Tag: typeof import('./src/components/Tag.vue')['default']
   }
 }
