@@ -19,8 +19,9 @@ const name = ref("");
 const arr = invoke("lans");
 
 const value = ref("");
-const options = reactive([
-]);
+// const options = reactive([
+// ]);
+const options: any[] = []
 // console.log(invoke("lans"));
 async function greet() {
   greetMsg.value = await invoke("lans");
