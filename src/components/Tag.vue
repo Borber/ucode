@@ -26,8 +26,9 @@
 </template>
 
 <script lang="ts" setup>
-import { nextTick, ref } from 'vue'
-import { ElInput } from 'element-plus'
+import {nextTick, ref} from 'vue'
+import {ElInput} from 'element-plus'
+import {invoke} from "@tauri-apps/api/tauri";
 
 const inputValue = ref('')
 const dynamicTags = ref([])
@@ -45,9 +46,14 @@ const showInput = () => {
   })
 }
 
-const handleInputConfirm = () => {
+const handleInputConfirm = async () => {
   if (inputValue.value) {
     dynamicTags.value.push(inputValue.value)
+    await invoke("add_tag", {
+      name: inputValue.value
+    }).then(async (id) => {
+      console.log(id)
+    });
   }
   inputVisible.value = false
   inputValue.value = ''
