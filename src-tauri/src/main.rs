@@ -2,13 +2,12 @@
 all(not(debug_assertions), target_os = "windows"),
 windows_subsystem = "windows"
 )]
+
 #[macro_use]
 extern crate rbatis;
 extern crate tantivy;
 
 use anyhow::Result;
-use rbatis::rbdc::db::ExecResult;
-use rbatis::rbdc::Error;
 use tauri::command;
 use tracing::{error, info};
 

@@ -6,7 +6,7 @@ const lan = ref("");
 const options: any[] = reactive([]);
 
 onMounted(async () => {
-  await invoke("lans").then(async (s: string[]) => {
+  await invoke<string[]>("lans").then(async (s) => {
     console.log(s);
     s.forEach((item) => {
       options.push({

@@ -34,8 +34,12 @@ const inputValue = ref('')
 const dynamicTags = ref([] as Ref<Tag>[])
 const inputVisible = ref(false)
 const InputRef = ref<InstanceType<typeof ElInput>>()
-const allTags = ref([])
+let allTags: Tag[] = [];
 
+// 标签实体
+// id: 标签id
+// name: 标签名
+// flag: 是否被删除 
 interface Tag {
   id: number;
   name: string;
@@ -62,10 +66,10 @@ const handleInputConfirm = async () => {
       flag: 0
     });
     dynamicTags.value.push(ctag)
-    await invoke("add_tag", {
+    await invoke<number>("add_tag", {
       name: inputValue.value
     }).then(async (id) => {
-      ctag.value.id = id as number;
+      ctag.value.id = id;
       console.log(dynamicTags.value.map( (id) => { return id.value; }));
     });
   }
@@ -74,7 +78,9 @@ const handleInputConfirm = async () => {
 }
 
 onMounted(async () => {
-  let allTags = await invoke("all_tag");
+  await invoke<Tag[]>("all_tag").then(async (tags) => { 
+    allTags = tags;
+   });
   console.log(allTags);
 })
 </script>
