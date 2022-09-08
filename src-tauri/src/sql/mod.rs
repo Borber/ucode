@@ -1,6 +1,3 @@
-use std::fs;
-use std::path::Path;
-
 use rbatis::Rbatis;
 use rbdc_sqlite::driver::SqliteDriver;
 use tracing::info;
@@ -16,5 +13,6 @@ pub fn init_sqlite(path: &str) -> Rbatis {
         &format!("sqlite://{}", path),
     )
         .unwrap();
+    info!("初始化连接成功: {}", path);
     rb
 }

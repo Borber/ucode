@@ -1,6 +1,5 @@
-use rbatis::{crud, impl_delete, impl_select, log, Rbatis};
+use rbatis::{crud, Rbatis};
 use serde::{Deserialize, Serialize};
-use tracing::info;
 
 use crate::sql::init_sqlite;
 
