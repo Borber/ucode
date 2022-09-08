@@ -35,7 +35,7 @@ async fn add_tag(name: String) -> Result<i64, ()> {
     match Tag::insert(&mut rb, &Tag {
         id: None,
         name: Some(name),
-        flag: Some(false),
+        flag: Some(0),
     }).await {
         Ok(result) => {
             info!("标签插入成功: {}", result.last_insert_id);
@@ -46,6 +46,12 @@ async fn add_tag(name: String) -> Result<i64, ()> {
             Err(())
         }
     }
+}
+
+#[command]
+async fn all_tag() -> Result<Vec<Tag>, ()> {
+    let mut rb = init_tag();
+    Ok(Tag::select_all(&mut rb).await.expect("获取所有tag失败"))
 }
 
 #[tokio::main]
@@ -60,7 +66,8 @@ async fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             lans,
-            add_tag
+            add_tag,
+            all_tag,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

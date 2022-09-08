@@ -11,7 +11,7 @@ use crate::sql::init_sqlite;
 pub struct Tag {
     pub id: Option<i64>,
     pub name: Option<String>,
-    pub flag: Option<bool>,
+    pub flag: Option<i64>,
 }
 
 crud!(Tag {});

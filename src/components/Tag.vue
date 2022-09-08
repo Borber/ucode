@@ -2,13 +2,13 @@
   <div>
     <el-tag
         v-for="tag in dynamicTags"
-        :key="tag"
+        :key="tag.value.id"
         class="el-tag"
         closable
         :disable-transitions="false"
         @close="handleClose(tag)"
     >
-      {{ tag }}
+      {{ tag.value.name }}
     </el-tag>
       <el-input
         v-if="inputVisible"
@@ -26,17 +26,25 @@
 </template>
 
 <script lang="ts" setup>
-import {nextTick, ref} from 'vue'
+import {nextTick, onMounted, Ref, ref} from 'vue'
 import {ElInput} from 'element-plus'
 import {invoke} from "@tauri-apps/api/tauri";
 
 const inputValue = ref('')
-const dynamicTags = ref([])
+const dynamicTags = ref([] as Ref<Tag>[])
 const inputVisible = ref(false)
 const InputRef = ref<InstanceType<typeof ElInput>>()
+const allTags = ref([])
 
-const handleClose = (tag: string) => {
-  dynamicTags.value.splice(dynamicTags.value.indexOf(tag), 1)
+interface Tag {
+  id: number;
+  name: string;
+  flag: number;
+}
+
+const handleClose = (tag: Ref<Tag>) => {
+  dynamicTags.value.splice(dynamicTags.value.indexOf(tag), 1);
+  console.log(dynamicTags.value.map( (id) => { return id.value; }));
 }
 
 const showInput = () => {
@@ -48,16 +56,27 @@ const showInput = () => {
 
 const handleInputConfirm = async () => {
   if (inputValue.value) {
-    dynamicTags.value.push(inputValue.value)
+    let ctag = ref({
+      id: 0,
+      name:  inputValue.value,
+      flag: 0
+    });
+    dynamicTags.value.push(ctag)
     await invoke("add_tag", {
       name: inputValue.value
     }).then(async (id) => {
-      console.log(id)
+      ctag.value.id = id as number;
+      console.log(dynamicTags.value.map( (id) => { return id.value; }));
     });
   }
   inputVisible.value = false
   inputValue.value = ''
 }
+
+onMounted(async () => {
+  let allTags = await invoke("all_tag");
+  console.log(allTags);
+})
 </script>
 
 
