@@ -1,23 +1,28 @@
 <template>
   <div>
     <el-tag
-        v-for="tag in dynamicTags"
-        :key="tag.value.id"
-        class="el-tag"
-        closable
-        :disable-transitions="false"
-        @close="handleClose(tag)"
+      v-for="tag in dynamicTags"
+      :key="tag.value.id"
+      class="el-tag"
+      closable
+      :disable-transitions="false"
+      @close="handleClose(tag)"
     >
       {{ tag.value.name }}
     </el-tag>
-      <el-input
+      <el-autocomplete
+        class="input-new-tag"
         v-if="inputVisible"
         ref="InputRef"
-        v-model="inputValue"
-        class="input-new-tag"
         size="small"
         @keyup.enter="handleInputConfirm"
         @blur="handleInputConfirm"
+        v-model="inputValue"
+        :fetch-suggestions="querySearch"
+        :trigger-on-focus="false"
+        clearable
+        placeholder="Please Input"
+        @select="handleSelect"
       />
       <el-button v-else class="button-new-tag" size="small" @click="showInput">
         + 新标签
@@ -26,7 +31,7 @@
 </template>
 
 <script lang="ts" setup>
-import {nextTick, onMounted, Ref, ref} from 'vue'
+import {nextTick, onMounted,reactive, Ref, ref} from 'vue'
 import {ElInput} from 'element-plus'
 import {invoke} from "@tauri-apps/api/tauri";
 
@@ -44,6 +49,34 @@ interface Tag {
   id: number;
   name: string;
   flag: number;
+}
+// 输入框内容
+interface RestaurantItem {
+  value: string
+  id: number
+}
+
+const restaurants = ref<RestaurantItem[]>([])
+// 返回建议输入的方法,querySearch(queryString, cb) 返回建议通过 cb(data) 自动完成建议。
+const querySearch = (queryString: string, cb: any, restaurant: RestaurantItem) => {
+  const results = queryString
+    ? restaurants.value.filter(createFilter(queryString))
+    : restaurant.value
+  // call callback function to return suggestions
+  cb(results)
+}
+const createFilter = (queryString: string) => {
+  return (restaurant: RestaurantItem) => {
+    return (
+      restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0
+    )
+  }
+}
+const loadAll: any[] = reactive([])
+
+
+const handleSelect = (item: RestaurantItem) => {
+  console.log(item)
 }
 
 const handleClose = (tag: Ref<Tag>) => {
@@ -81,7 +114,13 @@ onMounted(async () => {
   await invoke<Tag[]>("all_tag").then(async (tags) => { 
     allTags = tags;
    });
-  console.log(allTags);
+  allTags.forEach((item) => {
+    loadAll.push({
+      value: item.name,
+      id: item.id
+    });
+  })
+  restaurants.value = loadAll
 })
 </script>
 
