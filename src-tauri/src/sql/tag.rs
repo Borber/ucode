@@ -9,7 +9,7 @@ use crate::sql::init_sqlite;
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Tag {
     pub id: Option<i64>,
-    pub name: Option<String>,
+    pub value: Option<String>,
     pub flag: Option<i64>,
 }
 

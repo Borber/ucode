@@ -47,7 +47,7 @@ async fn check_table_tag(path: &str) {
             rb.exec(
                 "CREATE TABLE IF NOT EXISTS tag (
                 `id` INTEGER PRIMARY KEY AUTOINCREMENT ,
-                `name` TEXT NOT NULL ,
+                `value` TEXT NOT NULL ,
                 `flag` INTEGER default false);",
                 vec![]).await.expect("创建tag表失败");
             info!("tag表创建成功: {}", path);

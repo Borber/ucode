@@ -2,13 +2,13 @@
   <div>
     <el-tag
       v-for="tag in dynamicTags"
-      :key="tag.value.id"
+      :key="tag.id"
       class="el-tag"
       closable
       :disable-transitions="false"
       @close="handleClose(tag)"
     >
-      {{ tag.value.name }}
+      {{ tag.value }}
     </el-tag>
       <el-autocomplete
         class="input-new-tag"
@@ -21,7 +21,7 @@
         :fetch-suggestions="querySearch"
         :trigger-on-focus="false"
         clearable
-        placeholder="Please Input"
+        placeholder="标签"
         @select="handleSelect"
       />
       <el-button v-else class="button-new-tag" size="small" @click="showInput">
@@ -36,9 +36,9 @@ import {ElInput} from 'element-plus'
 import {invoke} from "@tauri-apps/api/tauri";
 
 const inputValue = ref('')
-const dynamicTags = ref([] as Ref<Tag>[])
+const dynamicTags = ref<Tag[]>([])
 const inputVisible = ref(false)
-const InputRef = ref<InstanceType<typeof ElInput>>()
+const InputRef = ref()
 let allTags: Tag[] = [];
 
 // 标签实体
@@ -47,39 +47,33 @@ let allTags: Tag[] = [];
 // flag: 是否被删除 
 interface Tag {
   id: number;
-  name: string;
+  value: string;
   flag: number;
 }
-// 输入框内容
-interface RestaurantItem {
-  value: string
-  id: number
-}
 
-const restaurants = ref<RestaurantItem[]>([])
 // 返回建议输入的方法,querySearch(queryString, cb) 返回建议通过 cb(data) 自动完成建议。
-const querySearch = (queryString: string, cb: any, restaurant: RestaurantItem) => {
+const querySearch = (queryString: string, cb: any, restaurant: Tag) => {
   const results = queryString
-    ? restaurants.value.filter(createFilter(queryString))
+    ? allTags.filter(createFilter(queryString))
     : restaurant.value
   // call callback function to return suggestions
   cb(results)
 }
+
 const createFilter = (queryString: string) => {
-  return (restaurant: RestaurantItem) => {
+  return (restaurant: Tag) => {
     return (
       restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0
     )
   }
 }
-const loadAll: any[] = reactive([])
 
 
-const handleSelect = (item: RestaurantItem) => {
+const handleSelect = (item: Tag) => {
   console.log(item)
 }
 
-const handleClose = (tag: Ref<Tag>) => {
+const handleClose = (tag: Tag) => {
   dynamicTags.value.splice(dynamicTags.value.indexOf(tag), 1);
   console.log(dynamicTags.value.map( (id) => { return id.value; }));
 }
@@ -87,22 +81,22 @@ const handleClose = (tag: Ref<Tag>) => {
 const showInput = () => {
   inputVisible.value = true
   nextTick(() => {
-    InputRef.value!.input!.focus()
+    InputRef.value.focus()
   })
 }
 
 const handleInputConfirm = async () => {
   if (inputValue.value) {
-    let ctag = ref({
+    let ctag = {
       id: 0,
-      name:  inputValue.value,
+      value: inputValue.value,
       flag: 0
-    });
+    };
     dynamicTags.value.push(ctag)
     await invoke<number>("add_tag", {
-      name: inputValue.value
+      value: inputValue.value
     }).then(async (id) => {
-      ctag.value.id = id;
+      ctag.id = id;
       console.log(dynamicTags.value.map( (id) => { return id.value; }));
     });
   }
@@ -114,13 +108,6 @@ onMounted(async () => {
   await invoke<Tag[]>("all_tag").then(async (tags) => { 
     allTags = tags;
    });
-  allTags.forEach((item) => {
-    loadAll.push({
-      value: item.name,
-      id: item.id
-    });
-  })
-  restaurants.value = loadAll
 })
 </script>
 

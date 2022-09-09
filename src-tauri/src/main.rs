@@ -24,12 +24,12 @@ async fn lans() -> Result<Vec<String>, ()> {
 }
 
 #[command]
-async fn add_tag(name: String) -> Result<i64, ()> {
+async fn add_tag(value: String) -> Result<i64, ()> {
     let mut rb = init_tag();
     info!("数据库链接成功");
     match Tag::insert(&mut rb, &Tag {
         id: None,
-        name: Some(name),
+        value: Some(value),
         flag: Some(0),
     }).await {
         Ok(result) => {
