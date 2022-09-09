@@ -31,19 +31,18 @@
 </template>
 
 <script lang="ts" setup>
-import {nextTick, onMounted,reactive, Ref, ref} from 'vue'
-import {ElInput} from 'element-plus'
+import {nextTick, onMounted, ref} from 'vue'
 import {invoke} from "@tauri-apps/api/tauri";
 
 const inputValue = ref('')
 const dynamicTags = ref<Tag[]>([])
 const inputVisible = ref(false)
 const InputRef = ref()
-let allTags: Tag[] = [];
+let allTags: Tag[] = []
 
 // 标签实体
 // id: 标签id
-// name: 标签名
+// value: 标签内容
 // flag: 是否被删除 
 interface Tag {
   id: number;
@@ -52,6 +51,7 @@ interface Tag {
 }
 
 // 返回建议输入的方法,querySearch(queryString, cb) 返回建议通过 cb(data) 自动完成建议。
+// TODO 需要更改, 模糊搜索
 const querySearch = (queryString: string, cb: any, restaurant: Tag) => {
   const results = queryString
     ? allTags.filter(createFilter(queryString))
@@ -75,7 +75,7 @@ const handleSelect = (item: Tag) => {
 
 const handleClose = (tag: Tag) => {
   dynamicTags.value.splice(dynamicTags.value.indexOf(tag), 1);
-  console.log(dynamicTags.value.map( (id) => { return id.value; }));
+  console.log(dynamicTags.value); 
 }
 
 const showInput = () => {
@@ -97,7 +97,7 @@ const handleInputConfirm = async () => {
       value: inputValue.value
     }).then(async (id) => {
       ctag.id = id;
-      console.log(dynamicTags.value.map( (id) => { return id.value; }));
+      console.log(dynamicTags.value);
     });
   }
   inputVisible.value = false

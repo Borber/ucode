@@ -5,7 +5,7 @@ use crate::sql::init_sqlite;
 
 /// 标签
 /// id: 主键
-/// name: 标签名
+/// value: 标签内容
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Tag {
     pub id: Option<i64>,
