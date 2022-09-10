@@ -63,7 +63,7 @@ const querySearch = (queryString: string, cb: any, restaurant: Tag) => {
 const createFilter = (queryString: string) => {
   return (restaurant: Tag) => {
     return (
-      restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0
+      restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) !== -1
     )
   }
 }
