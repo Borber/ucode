@@ -71,7 +71,7 @@ async fn add_code(code: CodeDTO) -> Result<bool, ()> {
     let date = FastDateTime::now().unix_timestamp();
     let tags = code.tags.unwrap().iter().join(",");
     
-    let code = Code { id: None, path: Some("".to_string()), desc: code.desc, lan: code.lan, tags: Some(tags), create_time: Some(date), update_time: Some(date) };
+    let code = Code {id:None,path:Some("".to_string()),desc:code.desc,lan:code.lan,tags:Some(tags),create_time:Some(date),update_time:Some(date), body: code.body };
     Code::insert(&mut rb, &code).await.unwrap();
     info!("片段添加成功");
     Ok(true)

@@ -19,6 +19,7 @@ pub struct Code {
     pub desc: Option<String>,
     pub lan: Option<String>,
     pub tags: Option<String>,
+    pub body: Option<String>,
     pub create_time: Option<i64>,
     pub update_time: Option<i64>,
 }

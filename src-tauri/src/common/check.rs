@@ -75,6 +75,7 @@ async fn check_tabke_code(path: &str) {
                 `desc` TEXT NOT NULL ,
                 `lan`  TEXT NOT NULL ,
                 `tags` TEXT NOT NULL ,
+                `body` TEXT NOT NULL ,
                 `create_time` INTEGER NOT NULL,
                 `update_time` INTEGER NOT NULL);",
                 vec![]).await.expect("创建code表失败");
