@@ -5,12 +5,18 @@ windows_subsystem = "windows"
 
 use anyhow::{Result};
 use common::config::Conf;
+use model::code::CodeDTO;
+use rbatis::rbdc::datetime::FastDateTime;
+use sql::code::Code;
+use sql::init_code;
 use tauri::command;
 use tracing::{error, info};
+use itertools::Itertools;
 
 use crate::common::check::check;
 use crate::constants::LAN;
-use crate::sql::tag::{init_tag, Tag};
+use crate::sql::init_tag;
+use crate::sql::tag::Tag;
 
 mod sql;
 mod model;
@@ -59,19 +65,34 @@ async fn all_tag() -> Result<Vec<Tag>, ()> {
     }
 }
 
+#[command]
+async fn add_code(code: CodeDTO) -> Result<bool, ()> {
+    let mut rb = init_code();
+    let date = FastDateTime::now().unix_timestamp();
+    let tags = code.tags.unwrap().iter().join(",");
+    
+    let code = Code { id: None, path: Some("".to_string()), desc: code.desc, lan: code.lan, tags: Some(tags), create_time: Some(date), update_time: Some(date) };
+    Code::insert(&mut rb, &code).await.unwrap();
+    info!("片段添加成功");
+    Ok(true)
+}
+
 #[tokio::main]
 async fn main() {
+    // 初始化日志系统
     tracing_subscriber::fmt::init();
+    // 初始化全局配置
     Conf::init_conf();
-
-    check(Conf::gobal().path.as_str()).await;
-
+    // 检查基础设备
+    check().await;
+    // 设置`tauri`的异步运行时
     tauri::async_runtime::set(tokio::runtime::Handle::current());
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             lans,
             add_tag,
             all_tag,
+            add_code
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

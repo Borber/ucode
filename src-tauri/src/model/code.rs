@@ -2,7 +2,7 @@ use serde::Deserialize;
 
 /// 代码片段主体
 #[derive(Clone, Debug, Deserialize)]
-pub struct Code {
+pub struct CodeDTO {
     // 用途描述
     pub desc: Option<String>,
     // 语言类型

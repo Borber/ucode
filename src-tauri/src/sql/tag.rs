@@ -1,7 +1,5 @@
-use rbatis::{crud, Rbatis};
+use rbatis::crud;
 use serde::{Deserialize, Serialize};
-
-use crate::sql::init_sqlite;
 
 /// 标签
 /// id: 主键
@@ -14,9 +12,3 @@ pub struct Tag {
 }
 
 crud!(Tag {});
-
-
-/// TODO 后续通过配置文件获取地址, 而非写死
-pub fn init_tag() -> Rbatis {
-    init_sqlite("./data/db/tag.db")
-}
