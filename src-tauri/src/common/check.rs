@@ -24,7 +24,7 @@ fn check_dir(path: &str) {
 }
 
 fn check_dir_db(path: &str) {
-    let path = format!("{}{}", path, "/db");
+    let path = format!("{}{}", path, "db");
     match Path::new(path.as_str()).exists() {
         true => {
             info!("数据库目录正常: {}", path);
@@ -37,7 +37,7 @@ fn check_dir_db(path: &str) {
 }
 
 async fn check_table_tag(path: &str) {
-    let path = format!("{}{}", path, "/db/tag.db");
+    let path = format!("{}{}", path, "db/tag.db");
     match Path::new(path.as_str()).exists() {
         true => {
             info!("tag表正常: {}", path);

@@ -7,12 +7,16 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
+    Button: typeof import('./src/components/Button.vue')['default']
     ElAutocomplete: typeof import('element-plus/es')['ElAutocomplete']
     ElButton: typeof import('element-plus/es')['ElButton']
+    ElInput: typeof import('element-plus/es')['ElInput']
     ElOption: typeof import('element-plus/es')['ElOption']
     ElSelect: typeof import('element-plus/es')['ElSelect']
     ElTag: typeof import('element-plus/es')['ElTag']
     Greet: typeof import('./src/components/Greet.vue')['default']
+    Input: typeof import('./src/components/Input.vue')['default']
     Tag: typeof import('./src/components/Tag.vue')['default']
+    TextInput: typeof import('./src/components/textInput.vue')['default']
   }
 }

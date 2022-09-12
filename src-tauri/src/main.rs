@@ -3,7 +3,8 @@ all(not(debug_assertions), target_os = "windows"),
 windows_subsystem = "windows"
 )]
 
-use anyhow::Result;
+use anyhow::{Result};
+use common::config::Conf;
 use tauri::command;
 use tracing::{error, info};
 
@@ -46,16 +47,24 @@ async fn add_tag(value: String) -> Result<i64, ()> {
 #[command]
 async fn all_tag() -> Result<Vec<Tag>, ()> {
     let mut rb = init_tag();
-    Ok(Tag::select_all(&mut rb).await.expect("获取所有tag失败"))
+    match Tag::select_all(&mut rb).await {
+        Ok(tags) => {
+            info!("获取所有tag成功");
+            Ok(tags)
+        },
+        _ => {
+            error!("获取所有tag失败");
+            Ok(vec![]) // TODO 不知道这种写法是否合理， 但后期考虑使用统一返回体包装来处理状态
+        }
+    }
 }
 
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt::init();
+    Conf::init_conf();
 
-    // TODO 后续通过读取配置来获取地址
-    // 开发时不能设置为开发目录下的文件, 否则会被
-    check("./data").await;
+    check(Conf::gobal().path.as_str()).await;
 
     tauri::async_runtime::set(tokio::runtime::Handle::current());
     tauri::Builder::default()
