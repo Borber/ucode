@@ -1,20 +1,20 @@
 <template>
-  <div>
+  <div class="tag">
     <el-tag
       v-for="tag in dynamicTags"
       :key="tag.id"
       class="el-tag"
       closable
+      size="large"
       :disable-transitions="false"
       @close="handleClose(tag)"
     >
       {{ tag.value }}
     </el-tag>
+    <div class="input-new-tag">
       <el-autocomplete
-        class="input-new-tag"
         v-if="inputVisible"
         ref="InputRef"
-        size="small"
         @keyup.enter="handleInputConfirm"
         @blur="handleInputConfirm"
         v-model="inputValue"
@@ -24,9 +24,10 @@
         placeholder="标签"
         @select="handleSelect"
       />
-      <el-button v-else class="button-new-tag" size="small" @click="showInput">
+      <el-button v-else class="button-new-tag" @click="showInput">
         + 新标签
       </el-button>
+    </div>
   </div>
 </template>
 
@@ -63,7 +64,7 @@ const querySearch = (queryString: string, cb: any, restaurant: Tag) => {
 const createFilter = (queryString: string) => {
   return (restaurant: Tag) => {
     return (
-      restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0
+      restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) !== -1
     )
   }
 }
@@ -107,6 +108,7 @@ const handleInputConfirm = async () => {
 onMounted(async () => {
   await invoke<Tag[]>("all_tag").then(async (tags) => { 
     allTags = tags;
+    console.log("所有标签:", allTags);
    });
 })
 </script>
@@ -117,7 +119,8 @@ onMounted(async () => {
   margin-right: 5px;
 }
 .input-new-tag {
-  width: 90px;
+  width: 88px;
+  display: inline-block;
   vertical-align: bottom;
 }
 </style>

@@ -3,12 +3,16 @@ use std::path::Path;
 
 use tracing::info;
 
-use crate::sql::init_sqlite;
+use crate::sql::{init_tag, init_code};
 
-pub async fn check(path: &str) {
+use super::config::Conf;
+
+pub async fn check() {
+    let path = Conf::gobal().path.as_str();
     check_dir(path);
     check_dir_db(path);
     check_table_tag(path).await;
+    check_tabke_code(path).await;
 }
 
 fn check_dir(path: &str) {
@@ -24,7 +28,8 @@ fn check_dir(path: &str) {
 }
 
 fn check_dir_db(path: &str) {
-    let path = format!("{}{}", path, "/db");
+    // TODO 后续将地址固定化到配置类中， 由仓库地址自动产生
+    let path = format!("{}{}", path, "db");
     match Path::new(path.as_str()).exists() {
         true => {
             info!("数据库目录正常: {}", path);
@@ -37,13 +42,13 @@ fn check_dir_db(path: &str) {
 }
 
 async fn check_table_tag(path: &str) {
-    let path = format!("{}{}", path, "/db/tag.db");
+    let path = format!("{}{}", path, "db/tag.db");
     match Path::new(path.as_str()).exists() {
         true => {
             info!("tag表正常: {}", path);
         }
         false => {
-            let rb = init_sqlite(path.as_str());
+            let rb = init_tag();
             rb.exec(
                 "CREATE TABLE IF NOT EXISTS tag (
                 `id` INTEGER PRIMARY KEY AUTOINCREMENT ,
@@ -51,6 +56,30 @@ async fn check_table_tag(path: &str) {
                 `flag` INTEGER default false);",
                 vec![]).await.expect("创建tag表失败");
             info!("tag表创建成功: {}", path);
+        }
+    }
+}
+
+async fn check_tabke_code(path: &str) {
+    let path = format!("{}{}", path, "db/code.db");
+    match Path::new(path.as_str()).exists() {
+        true => {
+            info!("code表正常: {}", path);
+        }
+        false => {
+            let rb = init_code();
+            rb.exec(
+                "CREATE TABLE IF NOT EXISTS code (
+                `id` INTEGER PRIMARY KEY AUTOINCREMENT ,
+                `path` TEXT NOT NULL ,
+                `desc` TEXT NOT NULL ,
+                `lan`  TEXT NOT NULL ,
+                `tags` TEXT NOT NULL ,
+                `body` TEXT NOT NULL ,
+                `create_time` INTEGER NOT NULL,
+                `update_time` INTEGER NOT NULL);",
+                vec![]).await.expect("创建code表失败");
+            info!("code表创建成功: {}", path);
         }
     }
 }

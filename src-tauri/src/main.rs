@@ -3,13 +3,20 @@ all(not(debug_assertions), target_os = "windows"),
 windows_subsystem = "windows"
 )]
 
-use anyhow::Result;
+use anyhow::{Result};
+use common::config::Conf;
+use model::code::CodeDTO;
+use rbatis::rbdc::datetime::FastDateTime;
+use sql::code::Code;
+use sql::init_code;
 use tauri::command;
 use tracing::{error, info};
+use itertools::Itertools;
 
 use crate::common::check::check;
 use crate::constants::LAN;
-use crate::sql::tag::{init_tag, Tag};
+use crate::sql::init_tag;
+use crate::sql::tag::Tag;
 
 mod sql;
 mod model;
@@ -46,23 +53,46 @@ async fn add_tag(value: String) -> Result<i64, ()> {
 #[command]
 async fn all_tag() -> Result<Vec<Tag>, ()> {
     let mut rb = init_tag();
-    Ok(Tag::select_all(&mut rb).await.expect("获取所有tag失败"))
+    match Tag::select_all(&mut rb).await {
+        Ok(tags) => {
+            info!("获取所有tag成功");
+            Ok(tags)
+        },
+        _ => {
+            error!("获取所有tag失败");
+            Ok(vec![]) // TODO 不知道这种写法是否合理， 但后期考虑使用统一返回体包装来处理状态
+        }
+    }
+}
+
+#[command]
+async fn add_code(code: CodeDTO) -> Result<bool, ()> {
+    let mut rb = init_code();
+    let date = FastDateTime::now().unix_timestamp();
+    let tags = code.tags.unwrap().iter().join(",");
+    
+    let code = Code {id:None,path:Some("".to_string()),desc:code.desc,lan:code.lan,tags:Some(tags),create_time:Some(date),update_time:Some(date), body: code.body };
+    Code::insert(&mut rb, &code).await.unwrap();
+    info!("片段添加成功");
+    Ok(true)
 }
 
 #[tokio::main]
 async fn main() {
+    // 初始化日志系统
     tracing_subscriber::fmt::init();
-
-    // TODO 后续通过读取配置来获取地址
-    // 开发时不能设置为开发目录下的文件, 否则会被
-    check("./data").await;
-
+    // 初始化全局配置
+    Conf::init_conf();
+    // 检查基础设备
+    check().await;
+    // 设置`tauri`的异步运行时
     tauri::async_runtime::set(tokio::runtime::Handle::current());
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             lans,
             add_tag,
             all_tag,
+            add_code
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
